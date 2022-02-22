@@ -1,0 +1,35 @@
+html
+  head
+    meta(charset='utf-8')
+    title Find a Word - Word Assistant FAWWA
+    link(rel='stylesheet' href='css/style.css')
+  body
+    h1 Find a Word - Word Assistant FAWWA
+    hr
+
+    div#loadScreen
+      h2 Loading dictionary...
+
+    div.main.hidden#mainScreen
+      div.row
+        label Number of letters:
+        input.input-numeric#inputLetterCount(type='number' min=min max=max value=5)
+      div.row
+        label Known letters:
+        input.loose-text#inputKnownLetters(type='text' size=24)
+      div.row
+        label.textarea-label Dead letters:
+        textarea.loose-text#textareaDeadLetters(rows=2 cols=30 title='Letters not in the word')
+      div.row
+        label Word guess:
+        input.loose-text#inputWordGuess(type='text' size=24)
+        p.hint Use asterisk or question mark to denote an unknown letter
+      div.row
+        button#buttonShowWords Show words
+
+    hr
+
+    div.row.centered-list
+      ul#wordList
+
+    script(src='js/app.js' type='application/javascript')

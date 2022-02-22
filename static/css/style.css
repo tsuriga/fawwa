@@ -1,0 +1,73 @@
+body {
+  background: black;
+  color: white;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.row {
+  margin-bottom: 1em;
+}
+
+.main {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+form, .row > input, .row > textarea {
+  font-size: 18pt;
+}
+
+input {
+  text-align: center;
+}
+
+label {
+  margin-right: 0.5em;
+}
+
+.input-numeric {
+  padding-left: 12pt;
+}
+
+.loose-text {
+  letter-spacing: 8pt;
+  text-transform: uppercase;
+}
+
+.textarea-label {
+  vertical-align: top;
+}
+
+.hint {
+  font-style: italic;
+  font-size: 10pt;
+}
+
+button {
+  margin-top: 1em;
+  font-size: 18pt;
+  padding: 5px 15px;
+}
+
+.centered-list {
+  display: flex;
+  justify-content: center;
+}
+
+li {
+  text-align: left;
+}
+
+a:link, a:visited, a:hover, a:active {
+  color: yellow;
+  text-decoration: none;
+}
+
+a:hover {
+  font-style: italic;
+}

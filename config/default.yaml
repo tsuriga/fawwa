@@ -1,0 +1,26 @@
+dictionary:
+  path:
+    opted: sources/EDMTDictionary.json # file path to OPTED JSON file
+    scowl: sources/scowl-2020.12.07/final/ # directory path to SCOWL files
+  length: # minimum and maximum lengths of words to include
+    min: 3
+    max: 6
+  scowl:
+    include: # which SCOWL files are included when building the word archive
+      - american-words
+      - australian_variant_1-words
+      - australian_variant_2-words
+      - australian-words
+      - british_variant_1-words
+      - british_variant_2-words
+      - british_z-words
+      - british-words
+      - canadian_variant_1-words
+      - canadian_variant_2-words
+      - canadian-words
+      - english-words
+      - variant_1-words
+      - variant_2-words
+      - variant_3-words
+app:
+  port: 3000

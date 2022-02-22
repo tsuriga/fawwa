@@ -1,0 +1,21 @@
+{
+  "name": "fawwa",
+  "version": "1.0.0",
+  "description": "Word finding helper for Wordle and learning",
+  "main": "server.js",
+  "scripts": {
+    "build-dict": "node scripts/build-dict.js",
+    "unpack-dict": "node scripts/unpack-dict.js"
+  },
+  "dependencies": {
+    "config": "3.3.7",
+    "express": "4.17.3",
+    "fs-jetpack": "4.3.1",
+    "js-yaml": "4.1.0",
+    "lodash": "4.17.21",
+    "pug": "3.0.2",
+    "tar": "6.1.11"
+  },
+  "author": "tsuriga",
+  "license": "MIT"
+}

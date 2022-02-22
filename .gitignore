@@ -1,0 +1,9 @@
+node_modules/
+
+static/dict.json
+config/local.yaml
+
+sources/**
+!sources/.gitkeep
+
+.DS_Store
