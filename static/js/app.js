@@ -1,6 +1,6 @@
 (() => {
   /**
-   * Enforce uniqueness, lowercase and all letters input
+   * Enforce uniqueness, lowercase and all letters sorted input
    *
    * @param {string} currentValue - String from an input field
    * @param {number} maxLength - [OPTIONAL] Maximum length of the input
@@ -22,6 +22,25 @@
     return chars.join('').substring(0, maxLength || chars.length);
   };
 
+  /**
+   * Makes sure that the subject does not contain letters from the authority
+   *
+   * @param {Object} authority - Field with authority over subject
+   * @param {Object} subject - Subject field
+   */
+  const enforceLetterAuthority = (authority, subject) => {
+    let cleanSubject = '';
+
+    subjectLetters = subject.value.split('');
+    for (const letter of subjectLetters) {
+      if (!authority.value.includes(letter)) {
+        cleanSubject += letter;
+      }
+    }
+
+    subject.value = cleanSubject;
+  };
+
   // Grab elements for simple reference later
   const inputLetterCount = document.getElementById('inputLetterCount');
   const inputKnownLetters = document.getElementById('inputKnownLetters');
@@ -37,9 +56,11 @@
   // Filter some of the inputs on the go
   inputKnownLetters.addEventListener('keyup', () => {
     inputKnownLetters.value = enforceLetterSanity(inputKnownLetters.value, parseInt(inputLetterCount.value));
+    enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
   });
   textareaDeadLetters.addEventListener('keyup', () => {
     textareaDeadLetters.value = enforceLetterSanity(textareaDeadLetters.value);
+    enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
   });
   inputLetterCount.addEventListener('change', () => {
     // Make sure we don't have too long values where impossible
@@ -47,7 +68,7 @@
     inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value));
   });
   inputWordGuess.addEventListener('keyup', () => {
-    // Keep guesses clean
+    // Keep guesses clean from non-alphabeticals and non-wildcard characters
     inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value)).toLowerCase();
     inputWordGuess.value = inputWordGuess.value.replaceAll(/[^a-z\*\?]/g, '');
   });
