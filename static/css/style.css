@@ -49,9 +49,12 @@ label {
 }
 
 button {
-  margin-top: 1em;
   font-size: 18pt;
   padding: 5px 15px;
+}
+
+.first-button {
+  margin-top: 1em;
 }
 
 .centered-list {

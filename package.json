@@ -1,6 +1,6 @@
 {
   "name": "fawwa",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Word finding helper for Wordle and learning",
   "main": "server.js",
   "scripts": {

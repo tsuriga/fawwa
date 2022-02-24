@@ -11,8 +11,9 @@ Note that the sources may well contain a lot of words that are uncommon, perhaps
 ## Usage
 
 1. Change the configurations to your liking by overwriting _default.yaml_ values in your own _config/local.yaml_ as needed.
-2. Configure your reverse proxy for the app if you like.
-3. Run `npm start`.
+2. Run `npm run unpack-dict`.
+3. Configure your reverse proxy for the app if you like.
+4. Run `npm start`.
 
 See [Sources](#sources) and _config/default.yaml_ file for more information on available features and options.
 
@@ -31,3 +32,7 @@ To rebuild the dictionary archive, configure settings and run `npm run build-dic
 
 - Website and dictionary generation tools: MIT.
 - Derived included or built dictionaries: Please check OPTED and SCOWL websites for their licensing terms if you wish to do something commercial with this project.
+
+## Sample
+
+![FAWWA](https://github.com/tsuriga/fawwa/blob/master/fawwa.png?raw=true)

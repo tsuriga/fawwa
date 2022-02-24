@@ -49,6 +49,7 @@
   const loadScreen = document.getElementById('loadScreen');
   const mainScreen = document.getElementById('mainScreen');
   const buttonShowWords = document.getElementById('buttonShowWords');
+  const buttonClearFields = document.getElementById('buttonClearFields');
   const wordList = document.getElementById('wordList');
 
   let dictionary = [];
@@ -152,6 +153,12 @@
       wordEntry.innerHTML = `<a href="https://thefreedictionary.com/${encodeURIComponent(match)}">${match}</a>`;
       wordList.appendChild(wordEntry);
     }
+  });
+
+  buttonClearFields.addEventListener('click', () => {
+    inputKnownLetters.value = '';
+    textareaDeadLetters.value = '';
+    inputWordGuess.value = '';
   });
 
   const xhr = new XMLHttpRequest();
