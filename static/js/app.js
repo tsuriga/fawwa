@@ -23,17 +23,23 @@
   };
 
   /**
-   * Makes sure that the subject does not contain letters from the authority
+   * Makes sure that the subject either does not contain letters from the authority, or only contains letters from it
    *
    * @param {Object} authority - Field with authority over subject
    * @param {Object} subject - Subject field
+   * @param {(undefined|string)} extraLetters - [OPTIONAL] Extra letters to include in the search. If given, the check
+   *                                                       mode is flipped so that only included letters are accepted
    */
-  const enforceLetterAuthority = (authority, subject) => {
+  const enforceLetterAuthority = (authority, subject, extraLetters) => {
     let cleanSubject = '';
+    const authorityLetters = authority.value + (extraLetters || '');
 
     subjectLetters = subject.value.split('');
     for (const letter of subjectLetters) {
-      if (!authority.value.includes(letter)) {
+      if (
+          (!extraLetters && !authorityLetters.includes(letter)) ||
+          (extraLetters && authorityLetters.includes(letter))
+      ) {
         cleanSubject += letter;
       }
     }
@@ -58,10 +64,12 @@
   inputKnownLetters.addEventListener('keyup', () => {
     inputKnownLetters.value = enforceLetterSanity(inputKnownLetters.value, parseInt(inputLetterCount.value));
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
+    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '?*');
   });
   textareaDeadLetters.addEventListener('keyup', () => {
     textareaDeadLetters.value = enforceLetterSanity(textareaDeadLetters.value);
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
+    enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
   });
   inputLetterCount.addEventListener('change', () => {
     // Make sure we don't have too long values where impossible
@@ -69,9 +77,12 @@
     inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value));
   });
   inputWordGuess.addEventListener('keyup', () => {
-    // Keep guesses clean from non-alphabeticals and non-wildcard characters
+    // Restrict guess length to maximum
     inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value)).toLowerCase();
-    inputWordGuess.value = inputWordGuess.value.replaceAll(/[^a-z\*\?]/g, '');
+
+    // Only accept the possible and keep the impossible ones out
+    enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
+    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '*?');
   });
 
   // Find word options on button press and build a results list
@@ -161,6 +172,7 @@
     inputWordGuess.value = '';
   });
 
+  // Load the dictionary dynamically and only then enable the UI
   const xhr = new XMLHttpRequest();
 
   xhr.open('GET', 'dict.json', true);
@@ -173,7 +185,7 @@
       loadScreen.remove();
       mainScreen.classList.remove('hidden');
     } catch (e) {
-      console.error('Could not load dictionary');
+      console.error('Could not load the dictionary');
     }
   };
 
