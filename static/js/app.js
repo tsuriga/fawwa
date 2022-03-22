@@ -56,6 +56,59 @@
     subject.value = subject.value.toLowerCase();
   };
 
+  /**
+   * Sanitizes word guess to only contain properly formatted guess strings and calculates the final guess length
+   *
+   * @returns {boolean} True if word guess is sane, false if not
+   */
+  const sanitizeWordGuess = () => {
+    guessLength = 0;
+
+    let isBraceOpen = false;
+    let lettersInsideBrace = 0;
+    let isSane = true;
+
+    const guessLetters = inputWordGuess.value.split('');
+
+    for (const guessChar of guessLetters) {
+      // See if we are opening an exclusion group
+      if (guessChar === '(') {
+        if (isBraceOpen) {
+          window.alert('Improperly formatted guess, please check the value');
+          isSane = false;
+          break;
+        } else {
+          isBraceOpen = true;
+        }
+      } else if (guessChar === ')') {
+        // See if we are closing an exclusion group
+        if (isBraceOpen) {
+          if (lettersInsideBrace === 0) {
+            window.alert('Improperly formatted guess, please check the value');
+            isSane = false;
+            break;
+          } else {
+            guessLength++;
+            isBraceOpen = false;
+          }
+        } else {
+          window.alert('Improperly formatted guess, please check the value');
+          isSane = false;
+          break;
+        }
+      } else {
+        // Keep track of true guess word length
+        if (isBraceOpen) {
+          lettersInsideBrace++;
+        } else {
+          guessLength++;
+        }
+      }
+    }
+
+    return isSane;
+  };
+
   // Grab elements for simple reference later
   const inputLetterCount = document.getElementById('inputLetterCount');
   const inputKnownLetters = document.getElementById('inputKnownLetters');
@@ -76,12 +129,14 @@
     enforceLetterSanity(inputKnownLetters, parseInt(inputLetterCount.value));
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
     enforceLetterAuthority(inputKnownLetters, inputWordGuess, '?*()');
+    sanitizeWordGuess();
   });
   textareaDeadLetters.addEventListener('keyup', () => {
     enforceLowerCase(textareaDeadLetters);
     enforceLetterSanity(textareaDeadLetters);
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
     enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
+    sanitizeWordGuess();
   });
   inputLetterCount.addEventListener('change', () => {
     // Make sure we don't have too long values where impossible
@@ -94,39 +149,8 @@
     enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
     enforceLetterAuthority(inputKnownLetters, inputWordGuess, '*?()');
 
-    // Sanitize word guess to only contain properly formatted guess strings
     if (inputWordGuess.value.includes('(') || inputWordGuess.value.includes(')')) {
-      const guessLetters = inputWordGuess.value.split('');
-
-      guessLength = 0;
-      let isBraceOpen = false;
-      let isSane = true;
-
-      for (const guessChar of guessLetters) {
-        // See if we are opening an exclusion group
-        if (guessChar === '(') {
-          if (isBraceOpen) {
-            window.alert('Improperly formatted guess, please check the value');
-            isSane = false;
-          } else {
-            isBraceOpen = true;
-          }
-        } else if (guessChar === ')') {
-          // See if we are closing an exclusion group
-          if (isBraceOpen) {
-            guessLength++;
-            isBraceOpen = false;
-          } else {
-            window.alert('Improperly formatted guess, please check the value');
-            isSane = false;
-          }
-        } else {
-          // Keep track of true guess word length
-          if (!isBraceOpen) {
-            guessLength++;
-          }
-        }
-      }
+      let isSane = sanitizeWordGuess();
 
       if (guessLength > parseInt(inputLetterCount.value)) {
         window.alert('Guessed word cannot be longer than the number of letters, please check the value');
