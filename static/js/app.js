@@ -68,6 +68,7 @@
   const wordList = document.getElementById('wordList');
 
   let dictionary = [];
+  let guessLength = 0; // keep track of actual guess word length at all times
 
   // Filter some of the inputs on the go
   inputKnownLetters.addEventListener('keyup', () => {
@@ -97,11 +98,12 @@
     if (inputWordGuess.value.includes('(') || inputWordGuess.value.includes(')')) {
       const guessLetters = inputWordGuess.value.split('');
 
+      guessLength = 0;
       let isBraceOpen = false;
-      let guessLength = 0;
       let isSane = true;
 
       for (const guessChar of guessLetters) {
+        // See if we are opening an exclusion group
         if (guessChar === '(') {
           if (isBraceOpen) {
             window.alert('Improperly formatted guess, please check the value');
@@ -110,6 +112,7 @@
             isBraceOpen = true;
           }
         } else if (guessChar === ')') {
+          // See if we are closing an exclusion group
           if (isBraceOpen) {
             guessLength++;
             isBraceOpen = false;
@@ -118,6 +121,7 @@
             isSane = false;
           }
         } else {
+          // Keep track of true guess word length
           if (!isBraceOpen) {
             guessLength++;
           }
@@ -135,7 +139,9 @@
         buttonShowWords.setAttribute('disabled', 'disabled');
       }
     } else {
-      if (inputWordGuess.value.length > parseInt(inputLetterCount.value)) {
+      guessLength = inputWordGuess.value.length;
+
+      if (guessLength > parseInt(inputLetterCount.value)) {
         window.alert('Guessed word cannot be longer than the number of letters, please check the value');
         buttonShowWords.setAttribute('disabled', 'disabled');
       } else {
@@ -153,10 +159,18 @@
     let matchRegex = null;
 
     /*
-     * Factor in already-known data about possible and impossible words, assuming that word guess has already been
-     * sanitized to only contain correctly formatted guess strings.
-     */
-    if (inputWordGuess.value) {
+    * Factor in already-known data about possible and impossible words, assuming that word guess has already been
+    * sanitized to only contain correctly formatted guess strings.
+    */
+   if (inputWordGuess.value) {
+     // First check our guess length matches the number of letters
+     if (guessLength !== parseInt(inputLetterCount.value)) {
+       window.alert('Guess word length must match the number of letters in the word');
+       buttonShowWords.setAttribute('disabled', 'disabled');
+
+       return;
+      }
+
       let isBraceOpen = false;
       let notMatchString = '';
 
