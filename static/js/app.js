@@ -2,14 +2,13 @@
   /**
    * Enforce uniqueness, lowercase and all letters sorted input
    *
-   * @param {string} currentValue - String from an input field
+   * @param {string} subject - Subject input field
    * @param {number} maxLength - [OPTIONAL] Maximum length of the input
-   * @returns {string}
    */
-  const enforceLetterSanity = (currentValue, maxLength) => {
+  const enforceLetterSanity = (subject, maxLength) => {
     let chars = [];
 
-    let splitValue = currentValue.split('');
+    let splitValue = subject.value.split('');
 
     for (const splitChar of splitValue) {
       if (!chars.includes(splitChar) && splitChar.toLowerCase().match(/[a-z]/)) {
@@ -19,11 +18,12 @@
 
     chars.sort();
 
-    return chars.join('').substring(0, maxLength || chars.length);
+    subject.value = chars.join('').substring(0, maxLength || chars.length);
   };
 
   /**
-   * Makes sure that the subject either does not contain letters from the authority, or only contains letters from it
+   * Makes sure that the subject either does not contain letters from the authority, or alternatively only contains
+   * letters from it
    *
    * @param {Object} authority - Field with authority over subject
    * @param {Object} subject - Subject field
@@ -47,6 +47,15 @@
     subject.value = cleanSubject;
   };
 
+  /**
+   * Enforces all lowercase input on subject field
+   *
+   * @param {Object} subject - Subject field
+   */
+  const enforceLowerCase = (subject) => {
+    subject.value = subject.value.toLowerCase();
+  };
+
   // Grab elements for simple reference later
   const inputLetterCount = document.getElementById('inputLetterCount');
   const inputKnownLetters = document.getElementById('inputKnownLetters');
@@ -62,27 +71,77 @@
 
   // Filter some of the inputs on the go
   inputKnownLetters.addEventListener('keyup', () => {
-    inputKnownLetters.value = enforceLetterSanity(inputKnownLetters.value, parseInt(inputLetterCount.value));
+    enforceLowerCase(inputKnownLetters);
+    enforceLetterSanity(inputKnownLetters, parseInt(inputLetterCount.value));
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
-    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '?*');
+    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '?*()');
   });
   textareaDeadLetters.addEventListener('keyup', () => {
-    textareaDeadLetters.value = enforceLetterSanity(textareaDeadLetters.value);
+    enforceLowerCase(textareaDeadLetters);
+    enforceLetterSanity(textareaDeadLetters);
     enforceLetterAuthority(inputKnownLetters, textareaDeadLetters);
     enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
   });
   inputLetterCount.addEventListener('change', () => {
     // Make sure we don't have too long values where impossible
     inputKnownLetters.value = inputKnownLetters.value.substr(0, parseInt(inputLetterCount.value));
-    inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value));
   });
   inputWordGuess.addEventListener('keyup', () => {
-    // Restrict guess length to maximum
-    inputWordGuess.value = inputWordGuess.value.substr(0, parseInt(inputLetterCount.value)).toLowerCase();
+    enforceLowerCase(inputWordGuess);
 
     // Only accept the possible and keep the impossible ones out
     enforceLetterAuthority(textareaDeadLetters, inputWordGuess);
-    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '*?');
+    enforceLetterAuthority(inputKnownLetters, inputWordGuess, '*?()');
+
+    // Sanitize word guess to only contain properly formatted guess strings
+    if (inputWordGuess.value.includes('(') || inputWordGuess.value.includes(')')) {
+      const guessLetters = inputWordGuess.value.split('');
+
+      let isBraceOpen = false;
+      let guessLength = 0;
+      let isSane = true;
+
+      for (const guessChar of guessLetters) {
+        if (guessChar === '(') {
+          if (isBraceOpen) {
+            window.alert('Improperly formatted guess, please check the value');
+            isSane = false;
+          } else {
+            isBraceOpen = true;
+          }
+        } else if (guessChar === ')') {
+          if (isBraceOpen) {
+            guessLength++;
+            isBraceOpen = false;
+          } else {
+            window.alert('Improperly formatted guess, please check the value');
+            isSane = false;
+          }
+        } else {
+          if (!isBraceOpen) {
+            guessLength++;
+          }
+        }
+      }
+
+      if (guessLength > parseInt(inputLetterCount.value)) {
+        window.alert('Guessed word cannot be longer than the number of letters, please check the value');
+        isSane = false;
+      }
+
+      if (isSane) {
+        buttonShowWords.removeAttribute('disabled');
+      } else {
+        buttonShowWords.setAttribute('disabled', 'disabled');
+      }
+    } else {
+      if (inputWordGuess.value.length > parseInt(inputLetterCount.value)) {
+        window.alert('Guessed word cannot be longer than the number of letters, please check the value');
+        buttonShowWords.setAttribute('disabled', 'disabled');
+      } else {
+        buttonShowWords.removeAttribute('disabled');
+      }
+    }
   });
 
   // Find word options on button press and build a results list
@@ -93,14 +152,33 @@
     let matchString = '^';
     let matchRegex = null;
 
+    /*
+     * Factor in already-known data about possible and impossible words, assuming that word guess has already been
+     * sanitized to only contain correctly formatted guess strings.
+     */
     if (inputWordGuess.value) {
+      let isBraceOpen = false;
+      let notMatchString = '';
+
       const guessLetters = inputWordGuess.value.split('');
 
       for (const guessChar of guessLetters) {
-        if (guessChar === '?' || guessChar === '*') {
-          matchString += '[a-z]';
+        if (isBraceOpen) {
+          if (guessChar !== ')') {
+            notMatchString += guessChar;
+          } else {
+            isBraceOpen = false;
+            matchString += `[^${notMatchString}]`;
+            notMatchString = '';
+          }
         } else {
-          matchString += guessChar;
+          if (guessChar === '(') {
+            isBraceOpen = true;
+          } else if (guessChar === '?' || guessChar === '*') {
+            matchString += '[a-z]';
+          } else {
+            matchString += guessChar;
+          }
         }
       }
 

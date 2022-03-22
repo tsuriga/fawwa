@@ -22,8 +22,9 @@ html
         textarea.loose-text#textareaDeadLetters(rows=2 cols=30 title='Letters not in the word')
       div.row
         label Word guess:
-        input.loose-text#inputWordGuess(type='text' size=24)
-        p.hint Use asterisk or question mark to denote an unknown letter
+        input.loose-text#inputWordGuess(type='text' size=36)
+        p.hint Use asterisk or question mark to denote an unknown letter, use parentheses to denote impossible letters.
+        p.hint E.g. with known letters "A S W", guess "A (S) ? ? ?" will match AWASH but won't match ASKEW.
       div.row
         button.first-button#buttonShowWords Show words
       div.row
